@@ -1,0 +1,20 @@
+{
+  "name": "devtinder",
+  "version": "1.0.0",
+  "description": "Tinder for developers❣️",
+  "main": "index.js",
+  "scripts": {
+    "start" : "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "keywords": [
+    "javascript",
+    "nodejs",
+    "tinder"
+  ],
+  "author": "Ninad Arakh",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.1"
+  }
+}
