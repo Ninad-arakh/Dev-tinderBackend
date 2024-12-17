@@ -1,21 +1,18 @@
 const express = require("express");
 
 const app = express();
+const { adminAuth } = require("./utils/utils")
 
-let obj = {
-  "firstName" : "Vijay",
-  "lastName" : "Deverkonda",
-  "age" : 33
-}
+// app.use("/admin", adminAuth); 
 
-app.get("/home",(req,res) => {
-  res.send(obj);
-})
+app.get("/admin/Details",adminAuth, (req, res, next) =>{
+  res.send("admin details");
+  console.log("admin details sent")
+});
 
-app.post("/home", (req, res) =>{
-  res.send("data added successfully!")
-  
-  console.log(req.query);
+app.get("/admin/posts", (req, res, next) =>{
+  res.send("admin posts");
+  console.log("admin posts sent")
 })
 
 app.listen(7777, () => {
