@@ -1,20 +1,33 @@
 const express = require("express");
 
 const app = express();
-const { adminAuth } = require("./utils/utils")
+const Database = require("./Config/database");
+const User = require("./Models/User");
 
-// app.use("/admin", adminAuth); 
+app.post("/signup", async (req, res) => {
+  const obj = new User({
+    firstName: "Ninad",
+    lastName: "Arakh",
+    email: "ninad.arakh@gmail.com",
+    password: "123456",
+  });
 
-app.get("/admin/Details",adminAuth, (req, res, next) =>{
-  res.send("admin details");
-  console.log("admin details sent")
+  try {
+    await obj.save();
+    res.send("user added successfully...");
+    console.log("user added successfully...");
+  } catch (err) {
+    console.log(err);
+  }
 });
 
-app.get("/admin/posts", (req, res, next) =>{
-  res.send("admin posts");
-  console.log("admin posts sent")
-})
-
-app.listen(7777, () => {
-  console.log("server is running on port 7777");
-});
+Database()
+  .then(() => {
+    console.log("Database Connected successfully...");
+    app.listen(7777, () => {
+      console.log("server is running on port 7777...");
+    });
+  })
+  .catch(() => {
+    console.log("Database Not Connected...");
+  });

@@ -4,7 +4,7 @@
   "description": "Tinder for developers❣️",
   "main": "index.js",
   "scripts": {
-    "start" : "node src/app.js",
+    "start": "node src/app.js",
     "dev": "nodemon src/app.js"
   },
   "keywords": [
@@ -15,6 +15,7 @@
   "author": "Ninad Arakh",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.21.1"
+    "express": "^4.21.1",
+    "mongoose": "^8.9.1"
   }
 }
