@@ -7,25 +7,38 @@ const User = require("./Models/User");
 app.use(express.json());
 
 //api to delete a user by id
-app.delete("/user", async (req, res) =>{
+app.delete("/user", async (req, res) => {
   const id = req.body.userId;
-  try{
+  try {
     await User.findByIdAndDelete(id);
-    res.send("user deleted...")
+    res.send("user deleted...");
   } catch (err) {
     res.status(500).send("something went wrong");
   }
-})
+});
 //api to update the user
-app.patch("/user", async (req, res) => {
-  const id = req.body.userId;
+app.patch("/user/:userId", async (req, res) => {
+  const id = req?.params?.userId;
   const data = req.body;
 
   try {
-    await User.findByIdAndUpdate({ _id: id }, data);
+    const allowedUpdades = [
+      "userId",
+      "photoUrl",
+      "firstName",
+      "lastName",
+      "password",
+    ];
+    const isUpdateAllowed = Object.keys(data).every((k) =>
+      allowedUpdades.includes(k)
+    );
+    if (!isUpdateAllowed) {
+      throw new Error("update not allowed...");
+    }
+    await User.findByIdAndUpdate({ _id: id }, data, { runValidators: true });
     res.send("user updated...");
   } catch (err) {
-    res.status(500).send("something went wrong");
+    res.status(500).send("something went wrong " + err.message);
   }
 });
 
@@ -63,6 +76,7 @@ app.post("/signup", async (req, res) => {
     // console.log("user added successfully...");
   } catch (err) {
     console.log(err);
+    res.status(500).send("something went wrong " + err.message);
   }
 });
 
