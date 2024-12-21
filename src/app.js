@@ -3,12 +3,15 @@ const app = express();
 
 const bcrypt = require("bcrypt");
 const validator = require("validator");
+const jwt = require("jsonwebtoken");
+const cookie = require("cookie-parser");
 
 const Database = require("./Config/database");
 const User = require("./Models/User");
 const { signUpValidationLogic } = require("./utils/signupValid");
 
 app.use(express.json());
+app.use(cookie());
 
 //api to delete a user by id
 app.delete("/user", async (req, res) => {
@@ -21,7 +24,23 @@ app.delete("/user", async (req, res) => {
   }
 });
 
-// LOGIN API
+//PROFILE API
+app.get("/profile", async (req, res) => {
+  try {
+    const { token } = req.cookies;
+    if (!token) {
+      throw new Error("token not found");
+    }
+    const decoded = await jwt.verify(token, "DEV@Tinder358");
+    const { _id } = decoded;
+    const user = await User.findById(_id);
+    res.send(user);
+  } catch (err) {
+    res.status(500).send("ERROR : ", err.message);
+  }
+});
+
+// LOGIN API and SENDING JWT TOKEN
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -39,8 +58,11 @@ app.post("/login", async (req, res) => {
     if (!isPassword) {
       throw new Error("Password is incorrect!");
     }
-
-    res.send("login successful");
+    if (isPassword) {
+      const token = await jwt.sign({ _id: userEmail._id }, "DEV@Tinder358");
+      res.cookie("token", token);
+      res.send("login successful");
+    }
   } catch (err) {
     return res.status(500).send("ERROR: " + err.message);
   }
