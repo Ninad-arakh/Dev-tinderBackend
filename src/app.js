@@ -1,8 +1,12 @@
 const express = require("express");
-
 const app = express();
+
+const bcrypt = require("bcrypt");
+const validator = require("validator");
+
 const Database = require("./Config/database");
 const User = require("./Models/User");
+const { signUpValidationLogic } = require("./utils/signupValid");
 
 app.use(express.json());
 
@@ -13,7 +17,32 @@ app.delete("/user", async (req, res) => {
     await User.findByIdAndDelete(id);
     res.send("user deleted...");
   } catch (err) {
-    res.status(500).send("something went wrong");
+    res.status(500).send("ERROR");
+  }
+});
+
+// LOGIN API
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const isEmailValid = validator.isEmail(email);
+    if (!isEmailValid) {
+      throw new Error("Please enter a valid email!");
+    }
+
+    const userEmail = await User.findOne({ email: email });
+    if (!userEmail) {
+      throw new Error("User not found!");
+    }
+    const isPassword = await bcrypt.compare(password, userEmail.password);
+    if (!isPassword) {
+      throw new Error("Password is incorrect!");
+    }
+
+    res.send("login successful");
+  } catch (err) {
+    return res.status(500).send("ERROR: " + err.message);
   }
 });
 //api to update the user
@@ -38,7 +67,7 @@ app.patch("/user/:userId", async (req, res) => {
     await User.findByIdAndUpdate({ _id: id }, data, { runValidators: true });
     res.send("user updated...");
   } catch (err) {
-    res.status(500).send("something went wrong " + err.message);
+    res.status(500).send("ERROR " + err.message);
   }
 });
 
@@ -50,7 +79,7 @@ app.get("/find", async (req, res) => {
     const arrUser = await User.find({ email: userEmail });
     res.send(arrUser);
   } catch (err) {
-    res.status(404).send("something went wrong...");
+    res.status(404).send("ERROR...");
   }
 });
 
@@ -60,23 +89,31 @@ app.get("/feed", async (req, res) => {
     const users = await User.find({});
     res.send(users);
   } catch (err) {
-    res.status(404).send("something went wrong...");
+    res.status(404).send("ERROR...");
   }
 });
 
 //api to create new user
 app.post("/signup", async (req, res) => {
-  // console.log(req.body);
-
-  const reqBody = new User(req.body);
-
   try {
+    signUpValidationLogic(req);
+    const { firstName, lastName, email, password, gender } = req?.body;
+
+    const passHash = await bcrypt.hash(password, 10);
+
+    const reqBody = new User({
+      firstName,
+      lastName,
+      email,
+      password: passHash,
+      gender,
+    });
+
     await reqBody.save();
     res.send("user added successfully...");
     // console.log("user added successfully...");
   } catch (err) {
-    console.log(err);
-    res.status(500).send("something went wrong " + err.message);
+    res.status(500).send("ERROR : " + err.message);
   }
 });
 
