@@ -9,6 +9,7 @@ const cookie = require("cookie-parser");
 const Database = require("./Config/database");
 const User = require("./Models/User");
 const { signUpValidationLogic } = require("./utils/signupValid");
+const { userAuth } = require("./middlewares/userAuth");
 
 app.use(express.json());
 app.use(cookie());
@@ -25,20 +26,23 @@ app.delete("/user", async (req, res) => {
 });
 
 //PROFILE API
-app.get("/profile", async (req, res) => {
+app.get("/profile",userAuth, async (req, res) => {
   try {
-    const { token } = req.cookies;
-    if (!token) {
-      throw new Error("token not found");
-    }
-    const decoded = await jwt.verify(token, "DEV@Tinder358");
-    const { _id } = decoded;
-    const user = await User.findById(_id);
-    res.send(user);
+    res.send(req?.user);
   } catch (err) {
     res.status(500).send("ERROR : ", err.message);
   }
 });
+
+//TESTING API
+app.post("/sendConnectionReq", userAuth, async (req, res)=>{
+  try{
+    res.send(req?.user?.firstName + " sent the connection request.")
+
+  }catch(err){
+    res.status(500).send("ERROR : ", err.message);
+  }
+})
 
 // LOGIN API and SENDING JWT TOKEN
 app.post("/login", async (req, res) => {
