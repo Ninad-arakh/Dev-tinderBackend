@@ -51,13 +51,21 @@ authRouter.post("/login", async (req, res) => {
       throw new Error("Password is incorrect!");
     }
     if (isPassword) {
-      const token = await jwt.sign({ _id: userEmail._id }, "DEV@Tinder358");
+      const token = await userEmail.getJWT();
       res.cookie("token", token);
       res.send("login successful");
     }
   } catch (err) {
     return res.status(500).send("ERROR: " + err.message);
   }
+});
+
+// LOGOUT API
+authRouter.post("/logout", async (req, res) => {
+  res.cookie("token", null, {
+    expires : new Date(Date.now())
+  })
+  res.send("logout successful");
 });
 
 module.exports = authRouter;
