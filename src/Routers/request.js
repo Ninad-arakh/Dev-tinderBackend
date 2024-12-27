@@ -17,6 +17,10 @@ requestRouter.post(
       const status = req.params.status;
 
       const toUser = await User.findById(toUserId);
+      const validStatus = ["ignored", "intrested"];
+      if (!validStatus.includes(status)) {
+        return res.status(400).json({ message: "Status is not valid!" });
+      }
       if (!toUser) {
         return res
           .status(400)
@@ -35,26 +39,20 @@ requestRouter.post(
           .json({ message: "Connection Request Already Sent!" });
       }
 
-      if (toUserId !== fromUserId) {
-        const connectionReq = new ConnectionRequest({
-          fromUserId,
-          toUserId,
-          status,
-        });
+      const connectionReq = new ConnectionRequest({
+        fromUserId,
+        toUserId,
+        status,
+      });
 
-        await connectionReq.save();
+      await connectionReq.save();
 
-        res.json({
-          message: "Connection request sent successfully",
-          data: connectionReq,
-        });
-      }
-      else{
-        console.log("will this execute?")
-        return res.status(400).json({message: "You can't send connection request to yourself"});
-      }
+      res.json({
+        message: "Connection request sent successfully",
+        data: connectionReq,
+      });
     } catch (err) {
-      res.status(400).send("ERROR : ", err.message);
+      res.status(400).json({ ERROR: err.message });
     }
   }
 );
