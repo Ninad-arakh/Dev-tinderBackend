@@ -57,4 +57,41 @@ requestRouter.post(
   }
 );
 
+// CONNECTION REQ REVIEW API
+requestRouter.post("/request/review/:status/:requestId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const loggedIn = req.user;
+      const { status, requestId } = req.params;
+
+      const validStatus = ["accepted", "rejected"];
+      if (!validStatus.includes(status)) {
+        throw new Error("Invalid Status!");
+      }
+
+      const request = await ConnectionRequest.findOne({
+        _id: requestId,
+        toUserId: loggedIn._id,
+        status: "intrested",
+      });
+
+      if (!request) {
+        throw new Error("Invalid Request!");
+      }
+
+      request.status = status;
+
+      const data = await request.save();
+
+      res.json({
+        message: `Connection request ${status} successfully`,
+        data,
+      });
+    } catch (err) {
+      res.status(400).json({ ERROR: err.message });
+    }
+  }
+);
+
 module.exports = requestRouter;

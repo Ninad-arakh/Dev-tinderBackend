@@ -7,6 +7,7 @@ const Database = require("./Config/database");
 const authRouter = require("./Routers/auth");
 const profileRouter = require("./Routers/profile");
 const requestRouter = require("./Routers/request");
+const userRouter = require("./Routers/user")
 
 app.use(express.json());
 app.use(cookie());
@@ -14,6 +15,7 @@ app.use(cookie());
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
+app.use("/", userRouter)
 
 Database()
   .then(() => {
