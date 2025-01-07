@@ -45,7 +45,7 @@ const userSchema = mongoose.Schema(
     photoUrl: {
       type: String,
       default:
-        "https://tse1.mm.bing.net/th?id=OIP.PqGa9lkt0PDixCqlcLIdSAHaHa&pid=Api&P=0&h=220",
+        "",
     },
   },
   {

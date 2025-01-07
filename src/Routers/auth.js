@@ -53,7 +53,10 @@ authRouter.post("/login", async (req, res) => {
     if (isPassword) {
       const token = await userEmail.getJWT();
       res.cookie("token", token);
-      res.send("login successful");
+      res.json({
+        message: "Login Success.",
+        data: userEmail
+      })
     }
   } catch (err) {
     return res.status(500).send("ERROR: " + err.message);
