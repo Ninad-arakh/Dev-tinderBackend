@@ -16,6 +16,22 @@ const signUpValidationLogic = (req) => {
   }
 };
 
+const validateEditProfile = (req) => {
+  const allowedUpdate = [
+    "firstName",
+    "lastName",
+    "about",
+    "photoUrl",
+    "gender",
+  ];
+  const isEditAllowed = Object.keys(req.body).every((field) =>
+    allowedUpdate.includes(field)
+  );
+
+  return isEditAllowed;
+};
+
 module.exports = {
-    signUpValidationLogic,
-}
+  signUpValidationLogic,
+  validateEditProfile,
+};

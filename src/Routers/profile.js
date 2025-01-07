@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const profileRouter = express.Router();
 
 const { userAuth } = require("../middlewares/userAuth");
+const { validateEditProfile } = require("../utils/signupValid");
 
 //PROFILE API
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
@@ -31,6 +32,22 @@ profileRouter.post("/profile/password", userAuth, async (req, res) => {
     res.send("password changed successfully!");
   } catch (err) {
     res.status(500).json("ERROR : ", err.message);
+  }
+});
+
+profileRouter.patch("/profile/update", userAuth, async (req, res) => {
+  try {
+    if (!validateEditProfile(req)) {
+      throw new Error("Invalid Edit Request!");
+    }
+    const loggedInUser = req.user;
+
+    Object.keys(req.body).forEach((key) => (loggedInUser[key] = req.body[key]));
+
+    await loggedInUser.save();
+    res.json({ message: "data updated successfully.", data: loggedInUser });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 

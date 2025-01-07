@@ -4,7 +4,7 @@ const ConnectionRequest = require("../Models/ConnectionRequest");
 const userRouter = express.Router();
 const User = require("../Models/User");
 
-const user_SaFe_data = "firstName lastName skills gender photoUrl";
+const user_SaFe_data = "firstName lastName skills gender photoUrl about";
 
 userRouter.get("/user/requests/reviewed", userAuth, async (req, res) => {
   try {
