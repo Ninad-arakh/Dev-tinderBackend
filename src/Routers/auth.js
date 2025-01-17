@@ -24,11 +24,16 @@ authRouter.post("/signup", async (req, res) => {
       gender,
     });
 
+    const token = await reqBody.getJWT();
+
     await reqBody.save();
-    res.send("user added successfully...");
-    // console.log("user added successfully...");
+    res.cookie("token", token);
+    res.json({
+      message: "user added successfully....",
+      data: reqBody,
+    });
   } catch (err) {
-    res.status(500).send("ERROR : " + err.message);
+    res.status(500).json({ERROR :  err.message});
   }
 });
 
@@ -55,20 +60,20 @@ authRouter.post("/login", async (req, res) => {
       res.cookie("token", token);
       res.json({
         message: "Login Success.",
-        data: userEmail
-      })
+        data: userEmail,
+      });
     }
   } catch (err) {
-    return res.status(500).send("ERROR: " + err.message);
+    return res.status(500).json({ERROR :  err.message});
   }
 });
 
 // LOGOUT API
 authRouter.post("/logout", async (req, res) => {
   res.cookie("token", null, {
-    expires : new Date(Date.now())
-  })
-  res.send("logout successful");
+    expires: new Date(Date.now()),
+  });
+  res.json({message : "logout successful"});
 });
 
 module.exports = authRouter;

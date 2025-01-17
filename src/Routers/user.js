@@ -13,7 +13,7 @@ userRouter.get("/user/requests/reviewed", userAuth, async (req, res) => {
     const pendingReq = await ConnectionRequest.find({
       toUserId: user._id,
       status: "intrested",
-    }).populate("fromUserId", ["firstName", "lastName"]);
+    }).populate("fromUserId", ["firstName", "lastName", "about", "photoUrl"]);
 
     res.json({
       message: "fetched data successfully.",

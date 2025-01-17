@@ -9,9 +9,9 @@ const { validateEditProfile } = require("../utils/signupValid");
 //PROFILE API
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
   try {
-    res.send(req?.user);
+    res.json({ data: req?.user });
   } catch (err) {
-    res.status(500).send("ERROR : ", err.message);
+    return res.status(500).json({ ERROR: err.message });
   }
 });
 
@@ -29,7 +29,7 @@ profileRouter.post("/profile/password", userAuth, async (req, res) => {
 
     await user.save();
 
-    res.send("password changed successfully!");
+    res.json({ message: "password changed successfully!" });
   } catch (err) {
     res.status(500).json("ERROR : ", err.message);
   }
