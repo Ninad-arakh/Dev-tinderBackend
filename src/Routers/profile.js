@@ -5,10 +5,15 @@ const profileRouter = express.Router();
 
 const { userAuth } = require("../middlewares/userAuth");
 const { validateEditProfile } = require("../utils/signupValid");
+const sendEmail = require("../utils/sendEmail")
 
 //PROFILE API
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
   try {
+    
+    const sendMail = await sendEmail.run();
+    console.log("sendMail : ", sendMail);
+    
     res.json({ data: req?.user });
   } catch (err) {
     return res.status(500).json({ ERROR: err.message });
