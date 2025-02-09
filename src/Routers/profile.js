@@ -11,8 +11,8 @@ const sendEmail = require("../utils/sendEmail")
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
   try {
     
-    const sendMail = await sendEmail.run();
-    console.log("sendMail : ", sendMail);
+    // const sendMail = await sendEmail.run();
+    // console.log("sendMail : ", sendMail);
     
     res.json({ data: req?.user });
   } catch (err) {

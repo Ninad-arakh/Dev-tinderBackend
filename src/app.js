@@ -5,12 +5,15 @@ require("dotenv").config();
 
 const cookie = require("cookie-parser");
 const Database = require("./Config/database");
+const initializeSocket = require("./utils/socket");
 
 const authRouter = require("./Routers/auth");
 const profileRouter = require("./Routers/profile");
 const requestRouter = require("./Routers/request");
 const userRouter = require("./Routers/user");
 const cors = require("cors");
+const http = require("http");
+const chatRouter = require("./Routers/chat");
 
 app.use(
   cors({
@@ -25,11 +28,16 @@ app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
+app.use("/", chatRouter);
+
+const server = http.createServer(app);
+
+initializeSocket(server);
 
 Database()
   .then(() => {
     console.log("Database Connected successfully...");
-    app.listen(7777, () => {
+    server.listen(7777, () => {
       console.log("server is running on port 7777...");
     });
   })
