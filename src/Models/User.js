@@ -1,6 +1,21 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-const jwt = require("jsonwebtoken")
+const jwt = require("jsonwebtoken");
+
+const profileImage = mongoose.Schema({
+  userName: {
+    type: String,
+    required: true,
+  },
+  filePath: {
+    type: String,
+    required: true,
+  },
+  fileName: {
+    type: String,
+    required: true,
+  },
+});
 
 const userSchema = mongoose.Schema(
   {
@@ -42,14 +57,10 @@ const userSchema = mongoose.Schema(
     skills: {
       type: [String],
     },
-    photoUrl: {
+    photoUrl: profileImage,
+    about: {
       type: String,
-      default:
-        "",
     },
-    about:{
-      type: String
-    }
   },
   {
     timestamps: true,
@@ -64,8 +75,6 @@ userSchema.methods.getJWT = async function () {
 
   return token;
 };
-
-
 
 const User = mongoose.model("User", userSchema);
 

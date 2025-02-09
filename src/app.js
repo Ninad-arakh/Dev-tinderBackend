@@ -14,6 +14,9 @@ const userRouter = require("./Routers/user");
 const cors = require("cors");
 const http = require("http");
 const chatRouter = require("./Routers/chat");
+const path = require("path");
+
+app.use('/uploads', express.static(path.join(__dirname, "..",'uploads')));
 
 app.use(
   cors({
