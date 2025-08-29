@@ -27,13 +27,19 @@ authRouter.post("/signup", async (req, res) => {
     const token = await reqBody.getJWT();
 
     await reqBody.save();
-    res.cookie("token", token);
+    res.cookie("token", token, {
+      httpOnly: true, // prevents JS access
+      secure: true, // required for HTTPS (Render is HTTPS)
+      sameSite: "none", // allow cross-origin
+      path: "/", // cookie available to all routes
+    });
+
     res.json({
       message: "user added successfully....",
       data: reqBody,
     });
   } catch (err) {
-    res.status(500).json({ERROR :  err.message});
+    res.status(500).json({ ERROR: err.message });
   }
 });
 
@@ -57,23 +63,32 @@ authRouter.post("/login", async (req, res) => {
     }
     if (isPassword) {
       const token = await userEmail.getJWT();
-      res.cookie("token", token);
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "none",
+        path: "/",
+      });
       res.json({
         message: "Login Success.",
         data: userEmail,
       });
     }
   } catch (err) {
-    return res.status(500).json({ERROR :  err.message});
+    return res.status(500).json({ ERROR: err.message });
   }
 });
 
 // LOGOUT API
 authRouter.post("/logout", async (req, res) => {
   res.cookie("token", null, {
-    expires: new Date(Date.now()),
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+    path: "/",
+    expires: new Date(0),
   });
-  res.json({message : "logout successful"});
+  res.json({ message: "logout successful" });
 });
 
 module.exports = authRouter;
