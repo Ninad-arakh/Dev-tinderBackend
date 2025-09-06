@@ -57,7 +57,10 @@ const userSchema = mongoose.Schema(
     skills: {
       type: [String],
     },
-    photoUrl: profileImage,
+    photoUrl: {
+      type: String, // store Cloudinary secure_url
+      default: "",
+    },
     about: {
       type: String,
     },

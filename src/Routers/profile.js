@@ -1,7 +1,7 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const multer = require("multer");
-const fs = require("fs")
+const fs = require("fs");
 
 const profileRouter = express.Router();
 
@@ -9,27 +9,25 @@ const { userAuth } = require("../middlewares/userAuth");
 const { validateEditProfile } = require("../utils/signupValid");
 const path = require("path");
 const User = require("../Models/User");
+const cloudinary = require("../utils/Cloudinary");
 // const sendEmail = require("../utils/sendEmail");
 
-// Ensure the 'uploads' directory exists
+// Multer setup (still needed to handle file upload before sending to Cloudinary)
 const uploadPath = "./uploads";
 if (!fs.existsSync(uploadPath)) {
-  fs.mkdirSync(uploadPath);  
+  fs.mkdirSync(uploadPath);
 }
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadPath);  
-  },
+  destination: (req, file, cb) => cb(null, uploadPath),
   filename: (req, file, cb) => {
-    const userName = req.user.firstName + req.user.lastName ;  
-    // const fileExtension = path.extname(file.originalname); 
-    cb(null, userName + ".jpg"); 
-  }
+    const userName = req.user.firstName + req.user.lastName;
+    cb(null, userName + path.extname(file.originalname));
+  },
 });
+const upload = multer({ storage });
 
-const upload = multer({storage})
-
+// 🔹 Upload profile image to Cloudinary
 profileRouter.post(
   "/profile/uploadImage",
   userAuth,
@@ -37,37 +35,45 @@ profileRouter.post(
   async (req, res) => {
     try {
       if (!req.file) {
-        return res.status(400).json({ message: 'No file uploaded' });  
+        return res.status(400).json({ message: "No file uploaded" });
       }
 
-      const userName = req.user.firstName + req.user.lastName;  
-      let filePath = req.file.path;
-      const fileName = req.file.filename;
+      const userName = req.user.firstName + req.user.lastName;
 
-      filePath = path.posix.join('uploads', fileName);
+      // Upload to Cloudinary
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "profile_pictures",
+        public_id: `${userName}_${req.user._id}`, // unique per user
+        overwrite: true,
+        transformation: [
+          { width: 500, height: 500, crop: "fill", gravity: "face" },
+        ],
+      });
 
+
+      // Remove local file after upload
+      fs.unlinkSync(req.file.path);
+
+      // Update user record with Cloudinary URL
       const updatedUser = await User.findByIdAndUpdate(
-        req.user._id,  // Assuming user id is in req.user
+        req.user._id,
         {
           $set: {
-            photoUrl: {
-              userName: userName,
-              filePath: filePath,
-              fileName: fileName,
-            },
+            photoUrl: result.secure_url, // Cloudinary image URL
           },
         },
         { new: true }
-      );
+      ).select("firstName lastName email photoUrl");;
 
-      // Return a success response with the file details
       res.status(200).json({
-        message: 'Profile image uploaded successfully',
+        message: "Profile image uploaded successfully",
         user: updatedUser,
       });
     } catch (error) {
-      console.error('Error during file upload:', error);
-      res.status(500).json({ message: 'Error uploading the file', error: error.message });
+      console.error("Error during Cloudinary upload:", error);
+      res
+        .status(500)
+        .json({ message: "Error uploading file", error: error.message });
     }
   }
 );

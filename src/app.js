@@ -16,7 +16,7 @@ const http = require("http");
 const chatRouter = require("./Routers/chat");
 const path = require("path");
 
-app.use('/uploads', express.static(path.join(__dirname, "..",'uploads')));
+// app.use('/uploads', express.static(path.join(__dirname, "..",'uploads')));
 
 app.use(
   cors({
