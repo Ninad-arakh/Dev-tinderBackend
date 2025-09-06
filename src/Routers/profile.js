@@ -49,7 +49,7 @@ profileRouter.post(
           { width: 500, height: 500, crop: "fill", gravity: "face" },
         ],
       });
-
+      // console.log("Cloudinary upload result:", result.url);
 
       // Remove local file after upload
       fs.unlinkSync(req.file.path);
@@ -57,13 +57,11 @@ profileRouter.post(
       // Update user record with Cloudinary URL
       const updatedUser = await User.findByIdAndUpdate(
         req.user._id,
-        {
-          $set: {
-            photoUrl: result.secure_url, // Cloudinary image URL
-          },
-        },
-        { new: true }
-      ).select("firstName lastName email photoUrl");;
+        { $set: { photoUrl: result.secure_url } },
+        { new: true, runValidators: true } // ensure validators & return updated doc
+      );
+      await updatedUser.save();
+      // console.log("updatedUser :", updatedUser);
 
       res.status(200).json({
         message: "Profile image uploaded successfully",

@@ -2,21 +2,6 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
 
-const profileImage = mongoose.Schema({
-  userName: {
-    type: String,
-    required: true,
-  },
-  filePath: {
-    type: String,
-    required: true,
-  },
-  fileName: {
-    type: String,
-    required: true,
-  },
-});
-
 const userSchema = mongoose.Schema(
   {
     firstName: {
@@ -58,7 +43,7 @@ const userSchema = mongoose.Schema(
       type: [String],
     },
     photoUrl: {
-      type: String, // store Cloudinary secure_url
+      type: String, // Cloudinary secure_url
       default: "",
     },
     about: {
