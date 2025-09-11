@@ -20,13 +20,13 @@ chatRouter.get("/chat/:toUserId", userAuth, async (req, res) => {
     });
     // console.log("isFriend : ", isFriend);
     if (!isFriend) {
-      return res.status(500).json({ data: "Please be friends with the user frist!" });
+      return res.status(500).json({ data: "Please be friends with the user first!" });
     } else {
       let chat = await Chat.findOne({
         participants: { $all: [userId, toUserId] },
       }).populate({
         path: "messages.senderId",
-        select: "firstName lastName",
+        select: "firstName lastName photoUrl",
       });
 
       if (!chat) {
